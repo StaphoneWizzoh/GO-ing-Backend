@@ -385,7 +385,7 @@ These are the API routes that require permissions to access.
 -   **Get all Users**
 
     -   **URL:** `/api/admin/all-users`
-    -   **Method:** `GET`
+    -   **Method:** `POST`
     -   **Request Body:**
         ```json
         {
@@ -424,7 +424,7 @@ These are the API routes that require permissions to access.
 -   **Get all Active users**
 
     -   **URL:** `/api/admin/active-users`
-    -   **Method:** `GET`
+    -   **Method:** `POST`
     -   **Request Body:**
         ```json
         {
@@ -463,7 +463,7 @@ These are the API routes that require permissions to access.
 -   **Get all Administrators**
 
     -   **URL:** `/api/admin/admin-users`
-    -   **Method:** `GET`
+    -   **Method:** `POST`
     -   **Request Body:**
         ```json
         {
@@ -502,7 +502,7 @@ These are the API routes that require permissions to access.
 -   **Get all Super Administrators**
 
     -   **URL:** `/api/admin/super-admin-users`
-    -   **Method:** `GET`
+    -   **Method:** `POST`
     -   **Request Body:**
         ```json
         {
@@ -541,7 +541,7 @@ These are the API routes that require permissions to access.
 -   **Get all Disabled (Deleted) Accounts**
 
     -   **URL:** `/api/admin/deleted-users`
-    -   **Method:** `GET`
+    -   **Method:** `POST`
     -   **Request Body:**
         ```json
         {
@@ -580,7 +580,7 @@ These are the API routes that require permissions to access.
 -   **Get all Inactive Accounts**
 
     -   **URL:** `/api/admin/inactive-users`
-    -   **Method:** `GET`
+    -   **Method:** `POST`
     -   **Request Body:**
         ```json
         {
@@ -619,7 +619,7 @@ These are the API routes that require permissions to access.
 -   **Get all Suspended Accounts**
 
     -   **URL:** `/api/admin/suspended-users`
-    -   **Method:** `GET`
+    -   **Method:** `POST`
     -   **Request Body:**
         ```json
         {
