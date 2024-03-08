@@ -1,1 +1,2 @@
-cmd/server 
+cmd/server
+test.* 
