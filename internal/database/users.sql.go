@@ -244,6 +244,102 @@ func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const demoteAdminToUser = `-- name: DemoteAdminToUser :one
+UPDATE users SET
+    user_role = 'user'
+WHERE id = $1
+RETURNING id, username, email, hashed_password, first_name, last_name, phone_number, date_of_birth, gender, shipping_address, billing_address, created_at, last_login, account_status, user_role, profile_picture, two_factor_auth
+`
+
+func (q *Queries) DemoteAdminToUser(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, demoteAdminToUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.HashedPassword,
+		&i.FirstName,
+		&i.LastName,
+		&i.PhoneNumber,
+		&i.DateOfBirth,
+		&i.Gender,
+		&i.ShippingAddress,
+		&i.BillingAddress,
+		&i.CreatedAt,
+		&i.LastLogin,
+		&i.AccountStatus,
+		&i.UserRole,
+		&i.ProfilePicture,
+		&i.TwoFactorAuth,
+	)
+	return i, err
+}
+
+const demoteSuperAdminToAdmin = `-- name: DemoteSuperAdminToAdmin :one
+UPDATE users SET
+    user_role = 'admin'
+WHERE id = $1
+RETURNING id, username, email, hashed_password, first_name, last_name, phone_number, date_of_birth, gender, shipping_address, billing_address, created_at, last_login, account_status, user_role, profile_picture, two_factor_auth
+`
+
+func (q *Queries) DemoteSuperAdminToAdmin(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, demoteSuperAdminToAdmin, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.HashedPassword,
+		&i.FirstName,
+		&i.LastName,
+		&i.PhoneNumber,
+		&i.DateOfBirth,
+		&i.Gender,
+		&i.ShippingAddress,
+		&i.BillingAddress,
+		&i.CreatedAt,
+		&i.LastLogin,
+		&i.AccountStatus,
+		&i.UserRole,
+		&i.ProfilePicture,
+		&i.TwoFactorAuth,
+	)
+	return i, err
+}
+
+const demoteSuperAdminToUser = `-- name: DemoteSuperAdminToUser :one
+UPDATE users SET
+    user_role = 'user'
+WHERE id = $1
+RETURNING id, username, email, hashed_password, first_name, last_name, phone_number, date_of_birth, gender, shipping_address, billing_address, created_at, last_login, account_status, user_role, profile_picture, two_factor_auth
+`
+
+func (q *Queries) DemoteSuperAdminToUser(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, demoteSuperAdminToUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.HashedPassword,
+		&i.FirstName,
+		&i.LastName,
+		&i.PhoneNumber,
+		&i.DateOfBirth,
+		&i.Gender,
+		&i.ShippingAddress,
+		&i.BillingAddress,
+		&i.CreatedAt,
+		&i.LastLogin,
+		&i.AccountStatus,
+		&i.UserRole,
+		&i.ProfilePicture,
+		&i.TwoFactorAuth,
+	)
+	return i, err
+}
+
 const demoteUserToCustomer = `-- name: DemoteUserToCustomer :one
 UPDATE users SET
     user_role = 'customer'
