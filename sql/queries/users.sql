@@ -151,6 +151,24 @@ UPDATE users SET
 WHERE id = $1
 RETURNING *;
 
+-- name: DemoteSuperAdminToAdmin :one
+UPDATE users SET
+    user_role = 'admin'
+WHERE id = $1
+RETURNING *;
+
+-- name: DemoteSuperAdminToUser :one
+UPDATE users SET
+    user_role = 'user'
+WHERE id = $1
+RETURNING *;
+
+-- name: DemoteAdminToUser :one
+UPDATE users SET
+    user_role = 'user'
+WHERE id = $1
+RETURNING *;
+
 -- name: DemoteUserToCustomer :one
 UPDATE users SET
     user_role = 'customer'

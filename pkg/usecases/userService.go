@@ -279,6 +279,18 @@ func (s *UserService) PromoteUserToSuperAdmin(ctx context.Context, userId uuid.U
 	return s.userRepo.PromoteUserToSuperAdmin(ctx, userId)
 }
 
+func (s *UserService) DemoteSuperAdminToAdmin(ctx context.Context, userId uuid.UUID)(model.User, error){
+	return s.userRepo.DemoteSuperAdminToAdmin(ctx, userId)
+}
+
+func (s *UserService) DemoteSuperAdminToUser(ctx context.Context, userId uuid.UUID)(model.User, error){
+	return s.userRepo.DemoteSuperAdminToUser(ctx, userId)
+}
+
+func (s *UserService) DemoteAdminToUser(ctx context.Context, userId uuid.UUID)(model.User, error){
+	return s.userRepo.DemoteAdminToUser(ctx, userId)
+}
+
 func (s *UserService) SuspendUser(ctx context.Context, userId uuid.UUID)(model.User, error){
 	return s.userRepo.SuspendUser(ctx, userId)
 }

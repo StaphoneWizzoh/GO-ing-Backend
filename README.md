@@ -317,6 +317,78 @@ These are the API routes that require permissions to access.
         }
         ```
 
+-   **Demote SuperUser to an Administrator**
+
+    -   **URL:** `/api/admin/demote-super-admin-to-admin`
+    -   **Method:** `PUT`
+    -   **Request Body:**
+        ```json
+        {
+            "email": "user@example.com"
+        }
+        ```
+    -   **Expected Response:**
+        ```json
+        {
+            "username": "JohnDoe",
+            "email": "user@example.com",
+            "last_login": {
+                "time": "2024-03-01 13:11:05.00489",
+                "valid": true
+            },
+            "account_status": "active",
+            "user_role": "admin"
+        }
+        ```
+
+-   **Demote SuperUser to a regular User**
+
+    -   **URL:** `/api/admin/demote-super-admin-to-user`
+    -   **Method:** `PUT`
+    -   **Request Body:**
+        ```json
+        {
+            "email": "user@example.com"
+        }
+        ```
+    -   **Expected Response:**
+        ```json
+        {
+            "username": "JohnDoe",
+            "email": "user@example.com",
+            "last_login": {
+                "time": "2024-03-01 13:11:05.00489",
+                "valid": true
+            },
+            "account_status": "active",
+            "user_role": "user"
+        }
+        ```
+
+-   **Demote an Admin to a regular User**
+
+    -   **URL:** `/api/admin/demote-admin-to-user`
+    -   **Method:** `PUT`
+    -   **Request Body:**
+        ```json
+        {
+            "email": "user@example.com"
+        }
+        ```
+    -   **Expected Response:**
+        ```json
+        {
+            "username": "JohnDoe",
+            "email": "user@example.com",
+            "last_login": {
+                "time": "2024-03-01 13:11:05.00489",
+                "valid": true
+            },
+            "account_status": "active",
+            "user_role": "user"
+        }
+        ```
+
 -   **Suspend a User Account**
 
     -   **URL:** `/api/admin/suspend-user`

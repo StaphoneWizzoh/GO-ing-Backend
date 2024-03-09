@@ -23,6 +23,9 @@ type UserRepository interface {
 
 	PromoteUserToAdmin(ctx context.Context, userId uuid.UUID) (model.User, error)
 	PromoteUserToSuperAdmin(ctx context.Context, userId uuid.UUID) (model.User, error)
+	DemoteSuperAdminToAdmin(ctx context.Context, userId uuid.UUID)(model.User, error)
+	DemoteSuperAdminToUser(ctx context.Context, userId uuid.UUID)(model.User, error)
+	DemoteAdminToUser(ctx context.Context, userId uuid.UUID)(model.User, error)
 	SuspendUser(ctx context.Context, userId uuid.UUID) (model.User, error)
 	RecoverUser(ctx context.Context, userId uuid.UUID) (model.User, error)
 
