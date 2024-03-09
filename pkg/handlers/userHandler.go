@@ -312,6 +312,97 @@ func (h *UserHandler) PromoteUserToSuperAdmin(w http.ResponseWriter, r *http.Req
 	RespondWithJSON(w, http.StatusOK, updatedUser)
 }
 
+func (h *UserHandler) DemoteSuperAdminToAdmin(w http.ResponseWriter, r *http.Request){
+	// params
+	var params struct {
+		Email     string `json:"email"`
+	}
+
+	// decode request body
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Failed to decode request body: %v", err))
+		return
+	}
+
+	// get superadmin id
+	superAdmin, err := h.userService.GetUserByEmail(r.Context(), params.Email)
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch super admin details: %v", err))
+		return
+	}
+
+	// demote superadmin to admin
+	admin, err := h.userService.DemoteSuperAdminToAdmin(r.Context(), superAdmin.ID)
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to demote superadmin to admin status : %v", err))
+		return
+	}
+
+	// respond with promoted user
+	RespondWithJSON(w, http.StatusOK, admin)
+}
+
+func (h *UserHandler) DemoteSuperAdminToUser(w http.ResponseWriter, r *http.Request){
+	// params
+	var params struct {
+		Email     string `json:"email"`
+	}
+
+	// decode request body
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Failed to decode request body: %v", err))
+		return
+	}
+
+	// get superadmin id
+	superAdmin, err := h.userService.GetUserByEmail(r.Context(), params.Email)
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch super admin details: %v", err))
+		return
+	}
+
+	// demote superadmin to user
+	user, err := h.userService.DemoteSuperAdminToUser(r.Context(), superAdmin.ID)
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to demote superadmin to user status : %v", err))
+		return
+	}
+
+	// respond with promoted user
+	RespondWithJSON(w, http.StatusOK, user)
+}
+
+func (h *UserHandler) DemoteAdminToUser(w http.ResponseWriter, r *http.Request){
+	// params
+	var params struct {
+		Email     string `json:"email"`
+	}
+
+	// decode request body
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Failed to decode request body: %v", err))
+		return
+	}
+
+	// get admin id
+	admin, err := h.userService.GetUserByEmail(r.Context(), params.Email)
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch admin details: %v", err))
+		return
+	}
+
+	// demote admin to user
+	user, err := h.userService.DemoteAdminToUser(r.Context(), admin.ID)
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to demote admin to user status : %v", err))
+		return
+	}
+
+	// respond with promoted user
+	RespondWithJSON(w, http.StatusOK, user)
+}
+
+
 func (h *UserHandler) SuspendUser(w http.ResponseWriter, r *http.Request){
 	// params
 	var params struct {

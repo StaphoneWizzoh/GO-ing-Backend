@@ -271,6 +271,63 @@ func (r *SQLUserRepository) PromoteUserToSuperAdmin(ctx context.Context, userId 
 	}, nil
 }
 
+// DemoteSuperAdminToAdmin demotes a superadmin to an admin
+func (r *SQLUserRepository) DemoteSuperAdminToAdmin(ctx context.Context, userId uuid.UUID)(model.User, error){
+	log.Printf("Updating the role of super admin with id %s to admin status", userId.String())
+
+	// update user
+	admin, err := r.DB.DemoteSuperAdminToAdmin(ctx, userId)
+	if err != nil{
+		log.Printf("Error updating the role of super admin with id %s to admin status: %s", userId.String(), err.Error())
+		return model.User{}, err
+	}
+	return model.User{
+		Username:       admin.Username,
+		Email:          admin.Email,
+		LastLogin:      admin.LastLogin,
+		AccountStatus:  admin.AccountStatus,
+		UserRole:       admin.UserRole,
+	}, nil
+}
+
+// DemoteSuperAdminToUser demotes a superadmin to a regular user
+func (r *SQLUserRepository) DemoteSuperAdminToUser(ctx context.Context, userId uuid.UUID)(model.User, error){
+	log.Printf("Updating the role of super admin with id %s to user status", userId.String())
+
+	// update user
+	user, err := r.DB.DemoteSuperAdminToUser(ctx, userId)
+	if err != nil{
+		log.Printf("Error updating the role of super admin with id %s to user status: %s", userId.String(), err.Error())
+		return model.User{}, err
+	}
+	return model.User{
+		Username:       user.Username,
+		Email:          user.Email,
+		LastLogin:      user.LastLogin,
+		AccountStatus:  user.AccountStatus,
+		UserRole:       user.UserRole,
+	}, nil
+}
+
+// DemoteAdminToUser demotes an admin to a regular user
+func (r *SQLUserRepository) DemoteAdminToUser(ctx context.Context, userId uuid.UUID)(model.User, error){
+	log.Printf("Updating the role of super admin with id %s to user status", userId.String())
+
+	// update user
+	user, err := r.DB.DemoteAdminToUser(ctx, userId)
+	if err != nil{
+		log.Printf("Error updating the role of admin with id %s to user status: %s", userId.String(), err.Error())
+		return model.User{}, err
+	}
+	return model.User{
+		Username:       user.Username,
+		Email:          user.Email,
+		LastLogin:      user.LastLogin,
+		AccountStatus:  user.AccountStatus,
+		UserRole:       user.UserRole,
+	}, nil
+}
+
 // SuspendUser suspendds an active user account
 func (r *SQLUserRepository) SuspendUser(ctx context.Context, userId uuid.UUID) (model.User, error){
 	log.Printf("Suspending user account with id %s :", userId.String())
