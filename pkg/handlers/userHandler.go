@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 
 	"html/template"
@@ -421,6 +422,10 @@ func (h *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request){
 		RespondWithError(w, http.StatusInternalServerError, "Error fetching all users from the database.")
 		return
 	}
+	if len(users)==0 {
+		RespondWithSuccess(w, http.StatusNotFound, "There are no users in the database")
+		return
+	}
 
 	RespondWithJSON(w, http.StatusOK, users)
 }
@@ -441,6 +446,10 @@ func (h *UserHandler) GetAdminUsers(w http.ResponseWriter, r *http.Request){
 	admins, err := h.userService.GetAdminUsers(r.Context(), params.Limit, params.Offset)
 	if err != nil{
 		RespondWithError(w, http.StatusInternalServerError, "Error fetching all administrators from the database.")
+		return
+	}
+	if len(admins)==0 {
+		RespondWithSuccess(w, http.StatusNotFound, "There are no administrators in the database")
 		return
 	}
 
@@ -465,6 +474,10 @@ func (h *UserHandler) GetSuperAdminUsers(w http.ResponseWriter, r *http.Request)
 		RespondWithError(w, http.StatusInternalServerError, "Error fetching all super administrators from the database.")
 		return
 	}
+	if len(superAdmins)==0 {
+		RespondWithSuccess(w, http.StatusNotFound, "There are no super administrators in the database")
+		return
+	}
 
 	RespondWithJSON(w, http.StatusOK, superAdmins)
 }
@@ -485,6 +498,10 @@ func (h *UserHandler) GetActiveUsers(w http.ResponseWriter, r *http.Request){
 	activeUsers, err := h.userService.GetActiveUsers(r.Context(), params.Limit, params.Offset)
 	if err != nil{
 		RespondWithError(w, http.StatusInternalServerError, "Error fetching all active users from the database.")
+		return
+	}
+	if len(activeUsers)==0 {
+		RespondWithSuccess(w, http.StatusNotFound, "There are no active users in the database")
 		return
 	}
 
@@ -509,7 +526,12 @@ func (h *UserHandler) GetInactiveUsers(w http.ResponseWriter, r *http.Request){
 		RespondWithError(w, http.StatusInternalServerError, "Error fetching inactive users from the database.")
 		return
 	}
-
+	if len(inactiveUsers)==0 {
+		log.Println("Inactive users:", inactiveUsers)
+		RespondWithSuccess(w, http.StatusNotFound, "There are no inactive users in the database")
+		return
+	}
+	
 	RespondWithJSON(w, http.StatusOK, inactiveUsers)
 }
 
@@ -531,6 +553,10 @@ func (h *UserHandler) GetSuspendedUsers(w http.ResponseWriter, r *http.Request){
 		RespondWithError(w, http.StatusInternalServerError, "Error fetching suspended users from the database.")
 		return
 	}
+	if len(suspendedUsers)==0 {
+		RespondWithSuccess(w, http.StatusNotFound, "There are no suspended users in the database")
+		return
+	}
 
 	RespondWithJSON(w, http.StatusOK, suspendedUsers)
 }
@@ -548,11 +574,15 @@ func (h *UserHandler) GetDeletedUsers(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	inactiveUsers, err := h.userService.GetDeletedUsers(r.Context(), params.Limit, params.Offset)
+	disabledUsers, err := h.userService.GetDeletedUsers(r.Context(), params.Limit, params.Offset)
 	if err != nil{
 		RespondWithError(w, http.StatusInternalServerError, "Error fetching inactive users from the database.")
 		return
 	}
+	if len(disabledUsers)==0 {
+		RespondWithSuccess(w, http.StatusNotFound, "There are no disabled users in the database")
+		return
+	}
 
-	RespondWithJSON(w, http.StatusOK, inactiveUsers)
+	RespondWithJSON(w, http.StatusOK, disabledUsers)
 }
