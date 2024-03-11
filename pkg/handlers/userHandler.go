@@ -355,8 +355,23 @@ func (h *UserHandler) DemoteSuperAdminToAdmin(w http.ResponseWriter, r *http.Req
 
 	// get superadmin id
 	superAdmin, err := h.userService.GetUserByEmail(r.Context(), params.Email)
+
+	
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch super admin details: %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
+		return
+	}
+
+	// Check if user is a superadmin
+	if superAdmin.UserRole != "superadmin"{
+		RespondWithError(w, http.StatusBadRequest,"User is not a super administrator")
 		return
 	}
 
@@ -386,7 +401,20 @@ func (h *UserHandler) DemoteSuperAdminToUser(w http.ResponseWriter, r *http.Requ
 	// get superadmin id
 	superAdmin, err := h.userService.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch super admin details: %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
+		return
+	}
+
+	// Check if user is a superadmin
+	if superAdmin.UserRole != "superadmin"{
+		RespondWithError(w, http.StatusBadRequest,"User is not a super administrator")
 		return
 	}
 
@@ -416,7 +444,20 @@ func (h *UserHandler) DemoteAdminToUser(w http.ResponseWriter, r *http.Request){
 	// get admin id
 	admin, err := h.userService.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch admin details: %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
+		return
+	}
+
+	// Check if user is a superadmin
+	if admin.UserRole != "admin"{
+		RespondWithError(w, http.StatusBadRequest,"User is not an administrator")
 		return
 	}
 
