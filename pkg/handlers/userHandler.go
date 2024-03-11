@@ -492,12 +492,28 @@ func (h *UserHandler) SuspendUser(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// suspend user
-	suspendedUser, err := h.userService.SuspendUser(r.Context(), user.ID)
-	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to suspend user account : %v", err))
+	// Check if user is suspended
+	if user.AccountStatus == "suspended"{
+		RespondWithError(w, http.StatusBadRequest,"User is already suspended")
 		return
 	}
+
+	// suspend user
+	suspendedUser, err := h.userService.SuspendUser(r.Context(), user.ID)
+
+	if err != nil {
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to suspend user: %v", err))
+		return
+	}
+
+	
 
 	// respond with suspended user
 	RespondWithJSON(w, http.StatusOK, suspendedUser)
@@ -521,13 +537,27 @@ func (h *UserHandler) RecoverUser(w http.ResponseWriter, r *http.Request){
 			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch user details: %v", err))
 			return
 		}
+		
+		// Check if user is recovered
+		if user.AccountStatus == "active"{
+			RespondWithError(w, http.StatusBadRequest,"User account is already recovered")
+			return
+		}
 	
 		// recover user
 		recoveredUser, err := h.userService.RecoverUser(r.Context(), user.ID)
 		if err != nil {
-			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to recover user account : %v", err))
+			// For non-existing user
+			if strings.Contains(err.Error(), "sql: no rows in result set"){
+				RespondWithError(w, http.StatusNotFound, "User not found")
+				return
+			}
+	
+			// Other errors
+			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to recover user: %v", err))
 			return
 		}
+
 	
 		// respond with recovered user
 		RespondWithJSON(w, http.StatusOK, recoveredUser)
@@ -552,12 +582,27 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
+	// Check if user account is deadctivated
+	if user.AccountStatus == "deleted"{
+		RespondWithError(w, http.StatusBadRequest,"User account is already deleted.")
+		return
+	}
+
 	// deactivate user account
 	err = h.userService.DeleteUser(r.Context(), user.ID)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to recover user account : %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to delete user: %v", err))
 		return
 	}
+
+	
 
 	// respond with status
 	RespondWithSuccess(w, http.StatusOK, "Successfully deactivated the user's account")
