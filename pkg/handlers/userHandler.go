@@ -266,8 +266,23 @@ func (h *UserHandler) PromoteUserToAdmin(w http.ResponseWriter, r *http.Request)
 	
 		// get user id
 		user, err := h.userService.GetUserByEmail(r.Context(), params.Email)
+
+		// check if the if the user is already an admin
+		if user.UserRole == "admin"{
+			RespondWithError(w, http.StatusBadRequest,"User already an admin")
+			return
+		}
+
+		// Error handling
 		if err != nil {
-			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch user details: %v", err))
+			// For non-existing user
+			if strings.Contains(err.Error(), "sql: no rows in result set"){
+				RespondWithError(w, http.StatusNotFound, "User not found")
+				return
+			}
+
+			// Other errors
+			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
 			return
 		}
 
@@ -296,8 +311,22 @@ func (h *UserHandler) PromoteUserToSuperAdmin(w http.ResponseWriter, r *http.Req
 
 	// get user id
 	user, err := h.userService.GetUserByEmail(r.Context(), params.Email)
+
+	// check if the if the user is already an admin
+	if user.UserRole == "superadmin"{
+		RespondWithError(w, http.StatusBadRequest,"User already a super admin")
+		return
+	}
+
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch user details: %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
 		return
 	}
 
@@ -326,8 +355,23 @@ func (h *UserHandler) DemoteSuperAdminToAdmin(w http.ResponseWriter, r *http.Req
 
 	// get superadmin id
 	superAdmin, err := h.userService.GetUserByEmail(r.Context(), params.Email)
+
+	
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch super admin details: %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
+		return
+	}
+
+	// Check if user is a superadmin
+	if superAdmin.UserRole != "superadmin"{
+		RespondWithError(w, http.StatusBadRequest,"User is not a super administrator")
 		return
 	}
 
@@ -357,7 +401,20 @@ func (h *UserHandler) DemoteSuperAdminToUser(w http.ResponseWriter, r *http.Requ
 	// get superadmin id
 	superAdmin, err := h.userService.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch super admin details: %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
+		return
+	}
+
+	// Check if user is a superadmin
+	if superAdmin.UserRole != "superadmin"{
+		RespondWithError(w, http.StatusBadRequest,"User is not a super administrator")
 		return
 	}
 
@@ -387,7 +444,20 @@ func (h *UserHandler) DemoteAdminToUser(w http.ResponseWriter, r *http.Request){
 	// get admin id
 	admin, err := h.userService.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch admin details: %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
+		return
+	}
+
+	// Check if user is a superadmin
+	if admin.UserRole != "admin"{
+		RespondWithError(w, http.StatusBadRequest,"User is not an administrator")
 		return
 	}
 
@@ -422,12 +492,28 @@ func (h *UserHandler) SuspendUser(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// suspend user
-	suspendedUser, err := h.userService.SuspendUser(r.Context(), user.ID)
-	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to suspend user account : %v", err))
+	// Check if user is suspended
+	if user.AccountStatus == "suspended"{
+		RespondWithError(w, http.StatusBadRequest,"User is already suspended")
 		return
 	}
+
+	// suspend user
+	suspendedUser, err := h.userService.SuspendUser(r.Context(), user.ID)
+
+	if err != nil {
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to suspend user: %v", err))
+		return
+	}
+
+	
 
 	// respond with suspended user
 	RespondWithJSON(w, http.StatusOK, suspendedUser)
@@ -451,13 +537,27 @@ func (h *UserHandler) RecoverUser(w http.ResponseWriter, r *http.Request){
 			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch user details: %v", err))
 			return
 		}
+		
+		// Check if user is recovered
+		if user.AccountStatus == "active"{
+			RespondWithError(w, http.StatusBadRequest,"User account is already recovered")
+			return
+		}
 	
 		// recover user
 		recoveredUser, err := h.userService.RecoverUser(r.Context(), user.ID)
 		if err != nil {
-			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to recover user account : %v", err))
+			// For non-existing user
+			if strings.Contains(err.Error(), "sql: no rows in result set"){
+				RespondWithError(w, http.StatusNotFound, "User not found")
+				return
+			}
+	
+			// Other errors
+			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to recover user: %v", err))
 			return
 		}
+
 	
 		// respond with recovered user
 		RespondWithJSON(w, http.StatusOK, recoveredUser)
@@ -482,12 +582,27 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
+	// Check if user account is deadctivated
+	if user.AccountStatus == "deleted"{
+		RespondWithError(w, http.StatusBadRequest,"User account is already deleted.")
+		return
+	}
+
 	// deactivate user account
 	err = h.userService.DeleteUser(r.Context(), user.ID)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to recover user account : %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to delete user: %v", err))
 		return
 	}
+
+	
 
 	// respond with status
 	RespondWithSuccess(w, http.StatusOK, "Successfully deactivated the user's account")
