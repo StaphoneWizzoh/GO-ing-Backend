@@ -266,8 +266,23 @@ func (h *UserHandler) PromoteUserToAdmin(w http.ResponseWriter, r *http.Request)
 	
 		// get user id
 		user, err := h.userService.GetUserByEmail(r.Context(), params.Email)
+
+		// check if the if the user is already an admin
+		if user.UserRole == "admin"{
+			RespondWithError(w, http.StatusBadRequest,"User already an admin")
+			return
+		}
+
+		// Error handling
 		if err != nil {
-			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch user details: %v", err))
+			// For non-existing user
+			if strings.Contains(err.Error(), "sql: no rows in result set"){
+				RespondWithError(w, http.StatusNotFound, "User not found")
+				return
+			}
+
+			// Other errors
+			RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
 			return
 		}
 
@@ -296,8 +311,22 @@ func (h *UserHandler) PromoteUserToSuperAdmin(w http.ResponseWriter, r *http.Req
 
 	// get user id
 	user, err := h.userService.GetUserByEmail(r.Context(), params.Email)
+
+	// check if the if the user is already an admin
+	if user.UserRole == "superadmin"{
+		RespondWithError(w, http.StatusBadRequest,"User already a super admin")
+		return
+	}
+
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to fetch user details: %v", err))
+		// For non-existing user
+		if strings.Contains(err.Error(), "sql: no rows in result set"){
+			RespondWithError(w, http.StatusNotFound, "User not found")
+			return
+		}
+
+		// Other errors
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to promote user: %v", err))
 		return
 	}
 
