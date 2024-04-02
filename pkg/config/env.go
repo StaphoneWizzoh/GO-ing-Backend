@@ -18,17 +18,9 @@ type Config struct{
 
 func LoadConfig() Config {
 	err := godotenv.Load()
-	if err != nil {
-		log.Println(errorString+"Error loading .env file: ", err)
-		log.Println(errorString+"Using predefined credentials")
-		return Config{
-			Port: "8000",
-			DbURL: "postgresql://postgres:staphone@127.0.0.1:5432/go_auth?sslmode=disable",
-			DefaultPageSize: 100,
-			DefaultPage: 1,
-		}
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatal("Error loading .env file: ", err)
 	}
-
 	return Config{
 		Port: os.Getenv("PORT"),
 		DbURL: os.Getenv("DB_URL"),
