@@ -35,11 +35,20 @@ func main(){
 	
 
 	// Setting up routes
-	r := mux.NewRouter()
-	r.Use(middleware.CORS)
-	getUserRouter(r, userHandler)	
+	router := mux.NewRouter()
+	// r.Use(middleware.CORS) 
+
+	getUserRouter(router, userHandler)
+
+	// Setting up middleware
+	corsMw, err := middleware.CreateCORSMiddleware()
+	if err != nil{
+		log.Fatal("Error in creating middleware required for routing :", err)
+	}
+	
+	handler := corsMw.Wrap(router)
 
 	// Starting the server
 	log.Printf("Server listening on port %s", cfg.Port)
-	log.Fatal(http.ListenAndServe(":"+cfg.Port, r))
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, handler))
 }
