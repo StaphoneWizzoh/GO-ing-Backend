@@ -22,15 +22,15 @@ func getUserRouter(r *mux.Router, userHandler *handlers.UserHandler) {
 
 	// Authenticated user routes
 	protectedUserRouter := userRouter.PathPrefix("").Subrouter()
-	protectedUserRouter.Use(middleware.Auth)
+	protectedUserRouter.Use(middleware.CorsAuth)
 	protectedUserRouter.HandleFunc("/update", userHandler.UpdateUser).Methods(http.MethodPut)
 	protectedUserRouter.HandleFunc("/update-profile-picture", userHandler.UpdateProfilePicture).Methods(http.MethodPut)
 	protectedUserRouter.HandleFunc("/reset-password", userHandler.RequestPasswordReset).Methods(http.MethodPut)
 
 	// Authenticated admin routes
 	protectedAdminRouter := r.PathPrefix("/api/admin").Subrouter()
-	protectedAdminRouter.Use(middleware.Auth)
-	protectedAdminRouter.Use(middleware.Admin)
+	protectedAdminRouter.Use(middleware.CorsAuth)
+	protectedAdminRouter.Use(middleware.CorsAdmin)
 	protectedAdminRouter.HandleFunc("/promote-admin", userHandler.PromoteUserToAdmin).Methods(http.MethodPut)
 	protectedAdminRouter.HandleFunc("/promote-super-admin", userHandler.PromoteUserToSuperAdmin).Methods(http.MethodPut)
 	protectedAdminRouter.HandleFunc("/demote-super-admin-to-admin", userHandler.DemoteSuperAdminToAdmin).Methods(http.MethodPut)
